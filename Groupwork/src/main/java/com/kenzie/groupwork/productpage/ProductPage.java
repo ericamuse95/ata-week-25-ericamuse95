@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.kenzie.groupwork.productpage.types.SortByEnum.PRICE_HIGH_TO_LOW;
 import static com.kenzie.groupwork.productpage.types.SortByEnum.PRICE_LOW_TO_HIGH;
@@ -46,12 +47,14 @@ public class ProductPage {
      * @return An Optional with the winning BuyingOption, or empty if none.
      */
     public Optional<ProductV2.BuyingOption> getFirstBuyingOption() {
-        List<ProductV2.BuyingOption> buyingOptions = productV2.buyingOptions();
-        if (!buyingOptions.isEmpty()) {
-            return buyingOptions.stream()
+//        List<ProductV2.BuyingOption> buyingOptions = productV2.buyingOptions();
+//        if (!buyingOptions.isEmpty()) {
+//            return buyingOptions.stream()
+//                .findFirst();
+//        }
+//        return Optional.empty();
+        return productV2.buyingOptions().stream()
                 .findFirst();
-        }
-        return Optional.empty();
     }
 
     /**
@@ -68,19 +71,26 @@ public class ProductPage {
      * @return Optional containing the image URL, or empty if no image exists.
      */
     public Optional<String> extractMainImageUrl(Integer longestDimension) {
-        Optional<ProductImagesV2> productImagesOptional = productV2.productImages();
-        if (productImagesOptional.isPresent()) {
-            ProductImagesV2 productImages = productImagesOptional.get();
-            List<ProductImagesV2.Image> images = productImages.images();
-            for (ProductImagesV2.Image image : images) {
-                String url = extractImageUrl(image, longestDimension);
-                if (url != null) {
-                    return Optional.of(url);
-                }
-            }
-        }
-
-        return Optional.empty();
+//        Optional<ProductImagesV2> productImagesOptional = productV2.productImages();
+//        if (productImagesOptional.isPresent()) {
+//            ProductImagesV2 productImages = productImagesOptional.get();
+//            List<ProductImagesV2.Image> images = productImages.images();
+//            for (ProductImagesV2.Image image : images) {
+//                String url = extractImageUrl(image, longestDimension);
+//                if (url != null) {
+//                    return Optional.of(url);
+//                }
+//            }
+//        }
+//
+//        return Optional.empty();
+        return productV2.productImages()
+                .flatMap(productImages -> productImages.images().stream()
+                        .map(image -> extractImageUrl(image, longestDimension))
+                        .filter(Objects::nonNull)
+                        .findFirst())
+                .map(Optional::of)
+                .orElse(Optional.empty());
     }
 
     /**
@@ -94,21 +104,29 @@ public class ProductPage {
      * @return An Optional containing the URL of the image, or empty if no image exists.
      */
     public Optional<String> extractLookImageUrl(Integer longestDimension) {
-        Optional<ProductImagesV2> productImages = productV2.productImages();
-        if (productImages.isPresent()) {
-            ProductImagesV2 productImagesV2 = productImages.get();
-            List<ProductImagesV2.Image> images = productImagesV2.images();
-            for (ProductImagesV2.Image image : images) {
-                String variant = image.variant();
-                if (variant != null && variant.equals(LOOK_VARIANT)) {
-                    String url = extractImageUrl(image, longestDimension);
-                    if (url != null) {
-                        return Optional.of(url);
-                    }
-                }
-            }
-        }
-        return Optional.empty();
+//        Optional<ProductImagesV2> productImages = productV2.productImages();
+//        if (productImages.isPresent()) {
+//            ProductImagesV2 productImagesV2 = productImages.get();
+//            List<ProductImagesV2.Image> images = productImagesV2.images();
+//            for (ProductImagesV2.Image image : images) {
+//                String variant = image.variant();
+//                if (variant != null && variant.equals(LOOK_VARIANT)) {
+//                    String url = extractImageUrl(image, longestDimension);
+//                    if (url != null) {
+//                        return Optional.of(url);
+//                    }
+//                }
+//            }
+//        }
+//        return Optional.empty();
+        return productV2.productImages()
+                .flatMap(productImages -> productImages.images().stream()
+                        .filter(image -> LOOK_VARIANT.equals(image.variant()))
+                        .map(image -> extractImageUrl(image, longestDimension))
+                        .filter(Objects::nonNull)
+                        .findFirst())
+                .map(Optional::of)
+                .orElse(Optional.empty());
     }
 
     /**
@@ -127,22 +145,41 @@ public class ProductPage {
                                               final PriceRangeOption priceRange,
                                               final PrimeOption primeOption) {
 
+//        Comparator<ProductV2> sorter = comparatorForSortBy.getOrDefault(sortBy, passthroughComparator());
+//        final List<ProductV2> unorderedProducts = productV2.getSimilarProducts();
+//        final List<ProductV2> matchingProducts = new ArrayList<>();
+//        if (unorderedProducts != null) {
+//            for (ProductV2 product : unorderedProducts) {
+//                if (Objects.nonNull(product) &&
+//                    product.isValid() &&
+//                    priceRange.priceIsWithin(product.getPrice())) {
+//                    for (ShippingProgramEnum shippingProgram : product.getShippingPrograms()) {
+//                        if (primeOption.matches(shippingProgram)) {
+//                            matchingProducts.add(product);
+//                            break;
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//        matchingProducts.sort(sorter);
+//        return matchingProducts;
         Comparator<ProductV2> sorter = comparatorForSortBy.getOrDefault(sortBy, passthroughComparator());
         final List<ProductV2> unorderedProducts = productV2.getSimilarProducts();
         final List<ProductV2> matchingProducts = new ArrayList<>();
         if (unorderedProducts != null) {
-            for (ProductV2 product : unorderedProducts) {
-                if (Objects.nonNull(product) &&
-                    product.isValid() &&
-                    priceRange.priceIsWithin(product.getPrice())) {
-                    for (ShippingProgramEnum shippingProgram : product.getShippingPrograms()) {
-                        if (primeOption.matches(shippingProgram)) {
-                            matchingProducts.add(product);
-                            break;
+            unorderedProducts.stream()
+                    .filter(Objects::nonNull)
+                    .filter(ProductV2::isValid)
+                    .filter(p -> priceRange.priceIsWithin(p.getPrice()))
+                    .forEach(p -> {
+                        for (ShippingProgramEnum shippingProgram : p.getShippingPrograms()) {
+                            if (primeOption.matches(shippingProgram)) {
+                                matchingProducts.add(p);
+                                break;
+                            }
                         }
-                    }
-                }
-            }
+                    });
         }
         matchingProducts.sort(sorter);
         return matchingProducts;

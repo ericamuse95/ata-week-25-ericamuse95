@@ -1,9 +1,6 @@
 package com.kenzie.optionals.productinventory;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * ProductInventory collects groups of items to be shipped. It uses a 
@@ -36,7 +33,17 @@ public class ProductInventory {
      * @return Map[Integer, String] of product IDs to product names. Does not include products without names.
      */
     Map<Integer, String> findProductNames() {
-        return new HashMap<Integer, String>();  // Placeholder
+        Map<Integer, String> productNames = new HashMap<>();
+        if (productUtility == null) {
+            throw new IllegalArgumentException("productUtility is null");
+        }
+        for (Integer productID : productIDs) {
+            Optional<String> name = Optional.ofNullable(productUtility.findProductName(productID));
+            if (name.isPresent()) {
+                productNames.put(productID, name.get());
+            }
+        }
+        return productNames.isEmpty() ? Collections.emptyMap() : productNames;
     }
 
     /**
@@ -45,6 +52,15 @@ public class ProductInventory {
      * @return Optional[Boolean] containing whether a product is ready to ship.
      */
     Optional<Boolean> isProductReady(Integer productID) {
-        return Optional.empty();  // Placeholder
+        if (productID == null) {
+            throw new IllegalArgumentException("The productID was null");
+        }
+        if(productUtility.findProductName(productID) == null){
+            throw new IllegalArgumentException("The productID was null");
+        }
+        if(productUtility.isProductReady(productID) == null){
+            return Optional.empty();
+        }
+        return Optional.of(productUtility.isProductReady(productID));  // Placeholder
     }
 }

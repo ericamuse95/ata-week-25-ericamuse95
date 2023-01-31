@@ -2,8 +2,10 @@ package com.kenzie.streams.drills;
 
 import com.kenzie.streams.drills.resources.Dish;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * You may need to explore the Collectors javadoc to solve these problems.
@@ -17,7 +19,11 @@ public class CollectingDrills {
      * @return A list of dishes of each type
      */
     public static Map<Dish.Type, List<Dish>> collectDishesByType(List<Dish> menu) {
-        throw new UnsupportedOperationException();
+//        throw new UnsupportedOperationException();
+        if(menu == null){
+            return Collections.emptyMap();
+        }
+        return menu.stream().collect(Collectors.groupingBy(Dish::getDishType));
     }
 
     /**
@@ -26,7 +32,11 @@ public class CollectingDrills {
      * @return The number of dishes of each type
      */
     public static Map<Dish.Type, Long> numberOfDishesByType(List<Dish> menu) {
-        throw new UnsupportedOperationException();
+//        throw new UnsupportedOperationException();
+        if(menu == null){
+            return Collections.emptyMap();
+        }
+        return menu.stream().collect(Collectors.groupingBy(Dish::getDishType, Collectors.counting()));
     }
 
     /**
@@ -35,7 +45,11 @@ public class CollectingDrills {
      * @return a map of a vegetarian flag to all of the dishes that are or aren't vegetarian
      */
     public static Map<Boolean, List<Dish>> vegetarianDishes(List<Dish> menu) {
-        throw new UnsupportedOperationException();
+//        throw new UnsupportedOperationException();
+        if(menu == null){
+            return Collections.emptyMap();
+        }
+        return menu.stream().collect(Collectors.partitioningBy(Dish::isVegetarian));
     }
 
     /**
@@ -44,6 +58,10 @@ public class CollectingDrills {
      * @return the average calorie count across all the dishes.
      */
     public static Double getAverageCalories(List<Dish> menu) {
-        throw new UnsupportedOperationException();
+//        throw new UnsupportedOperationException();
+        if(menu == null){
+            return 0.0;
+        }
+        return menu.stream().collect(Collectors.averagingInt(Dish::getCalories));
     }
 }

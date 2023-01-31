@@ -1,6 +1,8 @@
 package com.kenzie.optionals.publisher.optionals.models;
 
+import javax.naming.Binding;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -62,7 +64,15 @@ public class Book {
      *     have been left.
      */
     public Optional<Double> getWeightedRating() {
-        return Optional.empty();  // Placeholder
+        if (starRatings.isEmpty()) {
+            return Optional.empty();
+        }
+        double sum = 0;
+        for (int rating : starRatings) {
+            sum += rating;
+        }
+        double avg = sum / starRatings.size();
+        return Optional.of(avg);
     }
 
     /**
@@ -71,6 +81,10 @@ public class Book {
      *     if any.
      */
     public Optional<Printing> getPaperback() {
-        return Optional.empty();  // Placeholder
-    }
+            return Optional.ofNullable(printings)
+                    .orElse(Collections.emptyList())
+                    .stream()
+                    .filter(printing -> printing.getPrintingType().toString().equalsIgnoreCase("PAPERBACK"))
+                    .reduce((p1, p2) -> p1.getPrintDate().after(p2.getPrintDate()) ? p1 : p2);
+        }
 }

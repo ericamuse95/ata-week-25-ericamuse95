@@ -5,7 +5,7 @@ import java.util.List;
 
 public class ProjectServerManager {
 
-    public List<String> results;
+    public static List<String> results;
 
     /**
      * Constructor for ProjectServerManager.
@@ -18,7 +18,7 @@ public class ProjectServerManager {
      * Dummy method for unit test. Prints a submit message when called.
      * @param name Source string.
      */
-    public void submitToProject(String name) {
+    public static void submitToProject(String name) {
         System.out.println(name + " submitted to project server!");
         results.add(name);
     }

@@ -2,8 +2,10 @@ package com.kenzie.streams.listprocessing;
 
 import com.kenzie.streams.listprocessing.resources.ProjectServerManager;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class FileProcessor {
 
@@ -24,7 +26,15 @@ public class FileProcessor {
      * @return Processed list.
      */
     public List<String> filterDocs(List<String> source) {
-        return null;
+        if (source == null || source.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<String> result = source.stream()
+                .filter(s -> s.toLowerCase().endsWith(".txt") || s.toLowerCase().endsWith(".md"))
+                .map(String::toLowerCase)
+                .sorted()
+                .collect(Collectors.toList());
+        return result;
     }
 
     /**
@@ -34,7 +44,18 @@ public class FileProcessor {
      * @return Processed Set.
      */
     public Set<String> filterJava(List<String> source) {
-        return null;
+        if (source == null || source.isEmpty()) {
+            return Collections.emptySet();
+        }
+
+        Set<String> result = source.stream()
+                .filter(s -> s.endsWith(".java"))
+                .map(s -> {
+                    String fileName = s.substring(0, s.lastIndexOf('.'));
+                    return fileName.substring(0,1).toUpperCase() + fileName.substring(1) + ".java";
+                })
+                .collect(Collectors.toSet());
+        return result;
     }
 
     /**
@@ -44,6 +65,11 @@ public class FileProcessor {
      * @param source Source list.
      */
     public void sortAndSubmitAll(List<String> source) {
-
+        List<String> sortedFiles = source.stream()
+                .sorted()
+                .collect(Collectors.toList());
+        for (String fileName : sortedFiles) {
+            ProjectServerManager.submitToProject(fileName);
+        }
     }
 }
