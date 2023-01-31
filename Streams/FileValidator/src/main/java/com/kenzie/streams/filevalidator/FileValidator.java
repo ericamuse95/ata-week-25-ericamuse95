@@ -110,7 +110,7 @@ public class FileValidator {
      * @return Created stream.
      */
     public Stream<String> createStream(List<String> files) {
-        List<String> fileStream = files.stream().toList();
+        List<String> fileStream = files.stream().collect(Collectors.toList());
         return fileStream.stream();
     }
 

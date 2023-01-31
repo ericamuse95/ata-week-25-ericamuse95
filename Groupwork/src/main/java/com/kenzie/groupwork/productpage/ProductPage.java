@@ -42,7 +42,7 @@ public class ProductPage {
      *
      * Golf score: 10
      * Par: 4
-     * Your score:
+     * Your score:1
      *
      * @return An Optional with the winning BuyingOption, or empty if none.
      */
@@ -65,7 +65,7 @@ public class ProductPage {
      *
      * Golf score: 18
      * Par: 8
-     * Your score:
+     * Your score:1
      *
      * @param longestDimension The size of the longest dimension of the image.
      * @return Optional containing the image URL, or empty if no image exists.
@@ -98,7 +98,7 @@ public class ProductPage {
      *
      * Golf score: 24
      * Par: 11
-     * Your score:
+     * Your score:3
      *
      * @param longestDimension the size of the image's longest dimension.
      * @return An Optional containing the URL of the image, or empty if no image exists.
@@ -139,7 +139,7 @@ public class ProductPage {
      *
      * Golf score: 22
      * Par: 24
-     * Your score:
+     * Your score:3
      */
     public List<ProductV2> getSimilarProducts(final SortByEnum sortBy,
                                               final PriceRangeOption priceRange,
